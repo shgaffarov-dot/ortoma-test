@@ -1,0 +1,220 @@
+<!DOCTYPE html>
+<html lang="ru">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Тест на плоскостопие — Ortoma</title>
+<link href="https://fonts.googleapis.com/css2?family=Unbounded:wght@400;700;900&family=Mulish:wght@300;400;600&display=swap" rel="stylesheet">
+<style>
+  :root {
+    --ink: #0d0d0d;
+    --cream: #f5f0e8;
+    --accent: #c8f03c;
+    --muted: #888;
+  }
+  * { margin: 0; padding: 0; box-sizing: border-box; }
+  body { background: var(--cream); color: var(--ink); font-family: 'Mulish', sans-serif; min-height: 100vh; }
+
+  body::before {
+    content: '';
+    position: fixed; inset: 0;
+    background-image: url("data:image/svg+xml,%3Csvg viewBox='0 0 200 200' xmlns='http://www.w3.org/2000/svg'%3E%3Cfilter id='noise'%3E%3CfeTurbulence type='fractalNoise' baseFrequency='0.9' numOctaves='4' stitchTiles='stitch'/%3E%3C/filter%3E%3Crect width='100%25' height='100%25' filter='url(%23noise)' opacity='0.04'/%3E%3C/svg%3E");
+    pointer-events: none; z-index: 100;
+  }
+
+  .screen { display: none; min-height: 100vh; padding: 40px 24px; max-width: 480px; margin: 0 auto; flex-direction: column; align-items: center; justify-content: center; }
+  .screen.active { display: flex; }
+
+  /* INTRO */
+  .logo { font-family: 'Unbounded', sans-serif; font-size: 13px; font-weight: 700; letter-spacing: 0.2em; color: var(--muted); margin-bottom: 48px; text-transform: uppercase; }
+  .foot-icon { width: 120px; height: 120px; margin: 0 auto 32px; animation: float 3s ease-in-out infinite; }
+  @keyframes float { 0%,100%{transform:translateY(0) rotate(-2deg)} 50%{transform:translateY(-10px) rotate(2deg)} }
+  .intro-title { font-family: 'Unbounded', sans-serif; font-size: clamp(28px,7vw,38px); font-weight: 900; line-height: 1.1; margin-bottom: 16px; text-align: center; }
+  .intro-title span { background: var(--accent); padding: 2px 8px; }
+  .intro-sub { font-size: 16px; color: #555; line-height: 1.6; margin-bottom: 40px; font-weight: 300; text-align: center; }
+  .btn-primary { background: var(--ink); color: var(--accent); font-family: 'Unbounded', sans-serif; font-size: 14px; font-weight: 700; letter-spacing: 0.05em; padding: 20px 48px; border: none; cursor: pointer; text-transform: uppercase; transition: all 0.2s; clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); }
+  .btn-primary:hover { background: var(--accent); color: var(--ink); }
+  .tests-count { margin-top: 24px; font-size: 13px; color: var(--muted); letter-spacing: 0.1em; }
+
+  /* STEP */
+  .step-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 32px; width: 100%; }
+  .step-logo { font-family: 'Unbounded', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); letter-spacing: 0.2em; }
+  .step-counter { font-family: 'Unbounded', sans-serif; font-size: 12px; font-weight: 700; color: var(--muted); }
+  .progress-bar { height: 4px; background: rgba(0,0,0,0.1); margin-bottom: 40px; overflow: hidden; width: 100%; }
+  .progress-fill { height: 100%; background: var(--ink); transition: width 0.5s cubic-bezier(0.4,0,0.2,1); }
+
+  .step-visual { width: 100%; height: 200px; background: var(--ink); margin-bottom: 24px; display: flex; align-items: center; justify-content: center; position: relative; overflow: hidden; }
+  .step-visual img { width: 100%; height: 100%; object-fit: cover; }
+  .step-visual-emoji { font-size: 72px; animation: popIn 0.4s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes popIn { from{transform:scale(0.5);opacity:0} to{transform:scale(1);opacity:1} }
+  .step-visual-label { position: absolute; bottom: 12px; right: 12px; background: var(--accent); color: var(--ink); font-family: 'Unbounded', sans-serif; font-size: 10px; font-weight: 700; padding: 4px 10px; letter-spacing: 0.1em; text-transform: uppercase; }
+
+  .step-question { font-family: 'Unbounded', sans-serif; font-size: clamp(18px,4.5vw,22px); font-weight: 700; line-height: 1.3; margin-bottom: 12px; width: 100%; }
+  .step-hint { font-size: 14px; color: #666; font-weight: 300; line-height: 1.5; margin-bottom: 28px; padding-left: 12px; border-left: 2px solid var(--accent); width: 100%; }
+  .answers { display: flex; flex-direction: column; gap: 12px; width: 100%; }
+  .answer-btn { background: white; border: 2px solid rgba(0,0,0,0.08); padding: 18px 20px; text-align: left; cursor: pointer; font-family: 'Mulish', sans-serif; font-size: 15px; font-weight: 600; color: var(--ink); transition: all 0.18s; display: flex; align-items: center; gap: 14px; }
+  .answer-btn:hover { border-color: var(--ink); background: var(--ink); color: white; transform: translateX(4px); }
+  .answer-icon { font-size: 22px; flex-shrink: 0; }
+
+  /* RESULT */
+  .result-badge { font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.2em; text-transform: uppercase; background: var(--ink); color: var(--accent); padding: 8px 20px; margin-bottom: 32px; }
+  .result-big-icon { font-size: 96px; margin-bottom: 24px; animation: resultPop 0.6s cubic-bezier(0.34,1.56,0.64,1); }
+  @keyframes resultPop { from{transform:scale(0) rotate(-20deg);opacity:0} to{transform:scale(1) rotate(0);opacity:1} }
+  .result-title { font-family: 'Unbounded', sans-serif; font-size: clamp(22px,6vw,30px); font-weight: 900; line-height: 1.2; margin-bottom: 16px; text-align: center; }
+  .result-title.green { color: #1a8a52; }
+  .result-title.orange { color: #d4700a; }
+  .result-title.red { color: #cc2020; }
+  .result-desc { font-size: 15px; color: #555; line-height: 1.7; font-weight: 300; margin-bottom: 32px; max-width: 360px; text-align: center; }
+  .result-score { display: flex; justify-content: center; gap: 8px; margin-bottom: 32px; }
+  .score-dot { width: 12px; height: 12px; border-radius: 50%; background: rgba(0,0,0,0.1); }
+  .score-dot.filled { background: var(--ink); }
+  .result-cta { background: var(--ink); color: var(--accent); font-family: 'Unbounded', sans-serif; font-size: 12px; font-weight: 700; letter-spacing: 0.08em; padding: 18px 36px; border: none; cursor: pointer; text-transform: uppercase; width: 100%; clip-path: polygon(8px 0%,100% 0%,calc(100% - 8px) 100%,0% 100%); transition: all 0.2s; margin-bottom: 16px; }
+  .result-cta:hover { background: var(--accent); color: var(--ink); }
+  .restart-btn { background: none; border: none; font-family: 'Mulish', sans-serif; font-size: 13px; color: var(--muted); cursor: pointer; text-decoration: underline; text-underline-offset: 3px; }
+  .ortoma-footer { margin-top: 32px; font-family: 'Unbounded', sans-serif; font-size: 11px; font-weight: 700; letter-spacing: 0.25em; color: rgba(0,0,0,0.2); }
+
+  .screen-fade { animation: fadeSlide 0.35s ease both; }
+  @keyframes fadeSlide { from{opacity:0;transform:translateY(16px)} to{opacity:1;transform:translateY(0)} }
+</style>
+</head>
+<body>
+
+<!-- INTRO -->
+<div class="screen active" id="screen-intro">
+  <div class="logo">Ortoma × Ортопедия</div>
+  <div class="foot-icon">
+    <svg viewBox="0 0 120 140" fill="none" xmlns="http://www.w3.org/2000/svg" width="120" height="120">
+      <ellipse cx="55" cy="115" rx="38" ry="20" fill="#0d0d0d"/>
+      <path d="M25 85 Q20 60 28 40 Q35 20 50 15 Q65 10 72 22 Q78 33 75 50 Q72 65 68 80 Q64 95 55 105 Q45 115 35 112 Q25 109 25 85Z" fill="#0d0d0d"/>
+      <ellipse cx="78" cy="20" rx="8" ry="10" fill="#c8f03c"/>
+      <ellipse cx="88" cy="30" rx="7" ry="9" fill="#c8f03c"/>
+      <ellipse cx="93" cy="44" rx="6" ry="8" fill="#c8f03c"/>
+      <ellipse cx="90" cy="58" rx="6" ry="7" fill="#c8f03c"/>
+      <ellipse cx="84" cy="70" rx="6" ry="7" fill="#c8f03c"/>
+    </svg>
+  </div>
+  <h1 class="intro-title">Есть ли у тебя<br><span>плоскостопие?</span></h1>
+  <p class="intro-sub">Пройди 5 простых вопросов.<br>Без оборудования — прямо сейчас.</p>
+  <button class="btn-primary" onclick="startTest()">Начать тест →</button>
+  <p class="tests-count">5 вопросов · 2 минуты</p>
+  <div class="ortoma-footer">ORTOMA.UZ</div>
+</div>
+
+<!-- STEP -->
+<div class="screen" id="screen-step">
+  <div class="step-header">
+    <span class="step-logo">ORTOMA</span>
+    <span class="step-counter" id="step-counter">1 / 5</span>
+  </div>
+  <div class="progress-bar"><div class="progress-fill" id="progress-fill" style="width:20%"></div></div>
+  <div class="step-visual" id="step-visual">
+    <span class="step-visual-emoji" id="step-emoji">🦶</span>
+    <span class="step-visual-label" id="step-tag">Вопрос</span>
+  </div>
+  <h2 class="step-question" id="step-question"></h2>
+  <p class="step-hint" id="step-hint"></p>
+  <div class="answers" id="answers-container"></div>
+</div>
+
+<!-- RESULT -->
+<div class="screen" id="screen-result" style="text-align:center">
+  <div class="result-badge" id="result-badge">Результат</div>
+  <div class="result-big-icon" id="result-icon">🎉</div>
+  <h2 class="result-title" id="result-title"></h2>
+  <p class="result-desc" id="result-desc"></p>
+  <div class="result-score" id="result-score"></div>
+  <button class="result-cta" id="result-cta" onclick="openTelegram()"></button>
+  <button class="restart-btn" onclick="restartTest()">Пройти тест заново</button>
+  <div class="ortoma-footer">ORTOMA.UZ</div>
+</div>
+
+<script>
+const steps = [
+  { emoji:"💧", tag:"Тест с водой", question:"Намочи ступню и встань на бумагу. Что видишь?", hint:"Встань ровно, обе ноги на весу. Посмотри на форму отпечатка.", image:null,
+    answers:[{icon:"✅",text:"Чёткий «перешеек» — середина стопы почти не касается",score:0},{icon:"⚠️",text:"Перешеек узкий, но есть",score:1},{icon:"🔴",text:"Вся стопа отпечаталась сплошным пятном",score:2}]},
+  { emoji:"🌅", tag:"Симптомы", question:"Болит ли стопа или пятка утром после первых шагов?", hint:"Особенно — сразу как встаёшь с кровати.", image:null,
+    answers:[{icon:"✅",text:"Нет, всё нормально",score:0},{icon:"⚠️",text:"Иногда, через пару минут проходит",score:1},{icon:"🔴",text:"Да, каждое утро — больно идти",score:2}]},
+  { emoji:"👟", tag:"Обувь", question:"Посмотри на подошву своих кроссовок. Как они стёрты?", hint:"Неравномерный износ — признак нарушения биомеханики стопы.", image:null,
+    answers:[{icon:"✅",text:"Равномерно по всей подошве",score:0},{icon:"⚠️",text:"Чуть больше с внутренней стороны",score:1},{icon:"🔴",text:"Сильно стёрто с внутренней стороны / по краям",score:2}]},
+  { emoji:"🦵", tag:"Осанка", question:"Попроси кого-нибудь посмотреть на тебя сзади. Как стоят лодыжки?", hint:"Или сфотографируй себя сзади, стоя ровно.", image:null,
+    answers:[{icon:"✅",text:"Ровно, ахиллесы идут прямо вниз",score:0},{icon:"⚠️",text:"Слегка наклоняются внутрь",score:1},{icon:"🔴",text:"Сильно заваливаются внутрь (пронация)",score:2}]},
+  { emoji:"😓", tag:"Усталость", question:"Как чувствуются ноги после 2–3 часов ходьбы?", hint:"Прогулка, торговый центр, экскурсия.", image:null,
+    answers:[{icon:"✅",text:"Нормально, лёгкая усталость",score:0},{icon:"⚠️",text:"Гудят, хочется сесть",score:1},{icon:"🔴",text:"Сильная боль, отёк, невозможно долго ходить",score:2}]}
+];
+
+const results = [
+  { badge:"Отличный результат", icon:"🟢", title:"Всё хорошо!", titleClass:"green", desc:"По твоим ответам — стопа в норме. Рекомендуем раз в год делать профилактическое сканирование.", cta:"Записаться на профилактику", msg:"Привет! Прошёл тест на плоскостопие — результат: всё хорошо. Хочу записаться на профилактическое сканирование стопы. В какой день можно прийти?" },
+  { badge:"Есть признаки", icon:"🟡", title:"Начальные признаки плоскостопия", titleClass:"orange", desc:"Несколько симптомов присутствуют. На ранней стадии индивидуальные стельки помогают за 2–3 месяца.", cta:"Записаться на сканирование", msg:"Привет! Прошёл тест на плоскостопие — результат: есть начальные признаки. Хочу записаться на сканирование стопы. В какой день можно прийти?" },
+  { badge:"Нужна консультация", icon:"🔴", title:"Высокая вероятность плоскостопия", titleClass:"red", desc:"Твои ответы указывают на выраженное плоскостопие. Без коррекции это влияет на колени и позвоночник.", cta:"Записаться срочно", msg:"Привет! Прошёл тест на плоскостопие — результат: высокая вероятность плоскостопия. Хочу срочно записаться на сканирование стопы. В какой день можно прийти?" }
+];
+
+let currentStep = 0, totalScore = 0, currentResult = null;
+
+function startTest() {
+  currentStep = 0; totalScore = 0;
+  showScreen('screen-step');
+  renderStep();
+}
+
+function showScreen(id) {
+  document.querySelectorAll('.screen').forEach(s => s.classList.remove('active','screen-fade'));
+  const t = document.getElementById(id);
+  t.classList.add('active','screen-fade');
+}
+
+function renderStep() {
+  const s = steps[currentStep];
+  document.getElementById('step-counter').textContent = `${currentStep+1} / ${steps.length}`;
+  document.getElementById('progress-fill').style.width = `${((currentStep+1)/steps.length)*100}%`;
+
+  const visual = document.getElementById('step-visual');
+  if (s.image) {
+    visual.innerHTML = `<img src="${s.image}" alt=""><span class="step-visual-label">${s.tag}</span>`;
+  } else {
+    visual.innerHTML = `<span class="step-visual-emoji" id="step-emoji">${s.emoji}</span><span class="step-visual-label">${s.tag}</span>`;
+    const em = document.getElementById('step-emoji');
+    em.style.animation='none'; void em.offsetWidth; em.style.animation='popIn 0.4s cubic-bezier(0.34,1.56,0.64,1)';
+  }
+
+  document.getElementById('step-question').textContent = s.question;
+  document.getElementById('step-hint').textContent = s.hint;
+
+  const c = document.getElementById('answers-container');
+  c.innerHTML = '';
+  s.answers.forEach(a => {
+    const btn = document.createElement('button');
+    btn.className = 'answer-btn';
+    btn.innerHTML = `<span class="answer-icon">${a.icon}</span><span>${a.text}</span>`;
+    btn.onclick = () => { totalScore += a.score; currentStep++; currentStep < steps.length ? renderStep() : showResult(); };
+    c.appendChild(btn);
+  });
+}
+
+function showResult() {
+  let r = results[2];
+  if (totalScore <= 2) r = results[0];
+  else if (totalScore <= 6) r = results[1];
+  currentResult = r;
+
+  document.getElementById('result-badge').textContent = r.badge;
+  document.getElementById('result-icon').textContent = r.icon;
+  const rt = document.getElementById('result-title');
+  rt.textContent = r.title; rt.className = `result-title ${r.titleClass}`;
+  document.getElementById('result-desc').textContent = r.desc;
+  document.getElementById('result-cta').textContent = r.cta;
+
+  const sc = document.getElementById('result-score');
+  sc.innerHTML = '';
+  for(let i=0;i<steps.length*2;i++){const d=document.createElement('div');d.className='score-dot'+(i<totalScore?' filled':'');sc.appendChild(d);}
+  showScreen('screen-result');
+}
+
+function openTelegram() {
+  const text = encodeURIComponent(currentResult.msg);
+  window.open(`https://t.me/podiatr_uz?text=${text}`, '_blank');
+}
+
+function restartTest() { startTest(); showScreen('screen-step'); renderStep(); }
+</script>
+</body>
+</html>
